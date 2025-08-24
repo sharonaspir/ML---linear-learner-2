@@ -92,7 +92,7 @@ def print_results(
     print(f"Average |err|: {avg_abs:.2f}")
     print(f"MSE          : {mse:.2f}")
 
-def make_training_data_independent(set_b, set_w, n_points=500, x_low=-50, x_high=50, seed=0):
+def generate_training_data_independent(set_b, set_w, n_points=500, x_low=-50, x_high=50, seed=0):
     rng = random.Random(seed)
     N = len(set_w)
     data = []
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     set_b = 5.0
     set_w = [2.0, 5.0, 17.0]   
 
-    training_data = make_training_data_independent(set_b, set_w, n_points=101)
+    training_data = generate_training_data_independent(set_b, set_w, n_points=101)
     learning_rate = 0.0001
     epochs = 10000
 
