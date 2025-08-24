@@ -1,19 +1,16 @@
 import random
 from typing import List, Tuple, Sequence, Optional, TypedDict
-from LinearTrainingDataGeneration import generate_training_data_independent
+from LinearTrainingDataGeneration import DatasetRow, generate_dataset
 
 Vector = List[float]
 
-class Example(TypedDict):
-    x: List[float]
-    y: float
 
 
 def dot(a: Sequence[float], b: Sequence[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
 
 def guess_weights(
-    training_data: List[Example],
+    training_data: List[DatasetRow],
     learning_rate: float,
     epochs: int,
     seed: Optional[int] = None,
@@ -98,7 +95,7 @@ if __name__ == "__main__":
     set_b = 5.0
     set_w = [2.0, 5.0, 17.0]   
 
-    training_data = generate_training_data_independent(set_b, set_w)
+    training_data = generate_dataset(set_w, 100, set_b)
     learning_rate = 0.0001
     epochs = 10000
 
