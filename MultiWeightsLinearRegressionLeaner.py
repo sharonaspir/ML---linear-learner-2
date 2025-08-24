@@ -1,20 +1,27 @@
 import random
-from typing import List, Tuple, Sequence, Optional, TypedDict
+from typing import List, Tuple, Sequence, Optional
 from LinearTrainingDataGeneration import DatasetRow, generate_dataset
 
 Vector = List[float]
 
-
-
 def dot(a: Sequence[float], b: Sequence[float]) -> float:
+    """Compute dot product of two vectors."""
     return sum(x * y for x, y in zip(a, b))
+
+def initialize_weights(n_features: int, seed: Optional[int] = None) -> Tuple[float, Vector]:
+    """Randomly initialize bias and weights."""
+    rng = random.Random(seed)
+    b = rng.uniform(-1.0, 1.0)
+    w = [rng.uniform(-1.0, 1.0) for _ in range(n_features)]
+    return b, w
 
 def guess_weights(
     training_data: List[DatasetRow],
     learning_rate: float,
     epochs: int,
-    seed: Optional[int] = None,
-) -> Tuple[float, Vector]: 
+    seed: Optional[int] = None
+) -> Tuple[float, Vector]:
+    """Train linear regression weights using simple SGD."""
     if not training_data:
         raise ValueError("training_data is empty.")
     if "x" not in training_data[0] or "y" not in training_data[0]:
@@ -25,9 +32,7 @@ def guess_weights(
         raise ValueError("Feature vector 'x' must have at least one feature.")
 
     rng = random.Random(seed)
-
-    b = rng.uniform(-1.0, 1.0)
-    w = [rng.uniform(-1.0, 1.0) for _ in range(n_features)]
+    b, w = initialize_weights(n_features, seed)
 
     for _ in range(epochs):
         rng.shuffle(training_data)
@@ -52,7 +57,6 @@ def guess_weights(
 
 def target_function(x_vec: Sequence[float], b: float, w: Sequence[float]) -> float:
     return b + dot(w, x_vec)
-
 
 def print_results(
     b: float,
@@ -92,12 +96,12 @@ def print_results(
 
 # -------- Example run --------
 if __name__ == "__main__":
-    set_b = 5.0
-    set_w = [2.0, 5.0, 17.0]   
+    bias = 5.0
+    weigths = [2.0, 5.0, 17.0]   
 
-    training_data = generate_dataset(set_w, 100, set_b)
+    training_data = generate_dataset(weigths, 100, bias)
     learning_rate = 0.0001
     epochs = 10000
 
     b, w = guess_weights(training_data, learning_rate, epochs, seed=42)
-    print_results(b, w, set_b, set_w, learning_rate, epochs, seed=42)
+    print_results(b, w, bias, weigths, learning_rate, epochs, seed=42)
