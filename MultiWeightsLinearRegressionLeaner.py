@@ -1,5 +1,6 @@
 import random
 from typing import List, Tuple, Sequence, Optional, TypedDict
+from LinearTrainingDataGeneration import generate_training_data_independent
 
 Vector = List[float]
 
@@ -92,23 +93,12 @@ def print_results(
     print(f"Average |err|: {avg_abs:.2f}")
     print(f"MSE          : {mse:.2f}")
 
-def generate_training_data_independent(set_b, set_w, n_points=500, x_low=-50, x_high=50, seed=0):
-    rng = random.Random(seed)
-    N = len(set_w)
-    data = []
-    for _ in range(n_points):
-        x = [rng.uniform(x_low, x_high) for _ in range(N)]
-        y = set_b + dot(set_w, x)
-        data.append({'x': x, 'y': y})
-    return data
-
-
 # -------- Example run --------
 if __name__ == "__main__":
     set_b = 5.0
     set_w = [2.0, 5.0, 17.0]   
 
-    training_data = generate_training_data_independent(set_b, set_w, n_points=101)
+    training_data = generate_training_data_independent(set_b, set_w)
     learning_rate = 0.0001
     epochs = 10000
 
