@@ -1,42 +1,43 @@
 import collections
 
+NO_GO_SIMBOL = 'x'
+EMPTY_SQUARE_SYMBOL = ''
+END_SQUARE_SYMBOL = 'end'
+
 class GameBoard:
     def __init__(self, rows=4, cols=5):
-        self.rows = rows
-        self.cols = cols
-        self.board: list[list[str]] = [[' ' for _ in range(cols)] for _ in range(rows)]
         self.start_pos = (0, 0)
         self.end_pos = (0, 4)
-        
-        self.noGOSimbol = 'x'
-        self.emptySqureSimbol = ' '
 
-        self.board[1][0] = self.noGOSimbol
-        self.board[2][0] = self.noGOSimbol
-        self.board[3][0] = self.noGOSimbol
-        self.board[3][4] = self.noGOSimbol
-        self.board[2][4] = self.noGOSimbol 
+        self.rows = rows
+        self.cols = cols
+        self.board: list[list[str | int]] = [[EMPTY_SQUARE_SYMBOL for _ in range(cols)] for _ in range(rows)]
 
-        self.board[self.end_pos[0]][self.end_pos[1]] = 'end'
-        self.firstStep()
+        # Set no-go zones
+        self.board[1][0] = NO_GO_SIMBOL
+        self.board[2][0] = NO_GO_SIMBOL
+        self.board[3][0] = NO_GO_SIMBOL
+        self.board[1][4] = NO_GO_SIMBOL 
+        self.board[2][4] = NO_GO_SIMBOL 
+        self.board[3][4] = NO_GO_SIMBOL
 
-    def firstStep(self):
+        self.board[self.end_pos[0]][self.end_pos[1]] = END_SQUARE_SYMBOL
         self.board[self.start_pos[0]][self.start_pos[1]] = '0'
 
     def display(self):
         for row in self.board:
-            print(' | '.join([' ' if cell is None else str(cell) for cell in row]))
-            print('-' * (self.cols * 4 - 1))
+            print(' | '.join([str(cell) for cell in row]))
+            print('-' * (self.cols * 3))
 
     def canMoveToEnd(self):  
         # check no cell is empty
         for row in self.board:
             for cell in row:
-                if cell == self.emptySqureSimbol: 
+                if cell == EMPTY_SQUARE_SYMBOL: 
                     return False
                 
         # check if end is next to max step
-        max_step, (row, col) = self.getMaxStep()
+        (row, col) = self.getMaxStep()
         end_row, end_col = self.end_pos
         
         if (abs(row - end_row) == 1 ) and (abs(col - end_col) == 0):
@@ -52,8 +53,10 @@ class GameBoard:
         new_board.board = [row[:] for row in self.board]
         return new_board
     
-    def step(self, position, direction):
+    def step(self, direction):
+        position = self.getMaxStep()
         r, c = position
+        
         if direction == 'up':
             r = r - 1
         elif direction == 'down' :
@@ -63,76 +66,40 @@ class GameBoard:
         elif direction == 'right':
             c = c + 1
             
-        if 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == self.emptySqureSimbol:
-            self.board[r][c] = str(int(self.board[position[0]][position[1]]) + 1)
+        if 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == EMPTY_SQUARE_SYMBOL:
+            next_step = int(self.board[position[0]][position[1]]) + 1
+            self.board[r][c] = next_step
             return True
+        
         return False
     
     def getMaxStep(self): 
-        max_step = 0 
-        col = 0 
-        row = 0 
+        max_step, row, col = 0, 0, 0
         for r in range(self.rows): 
             for c in range(self.cols): 
-                val = self.board[r][c] 
-                try: 
-                    val = int(val) 
-                except (ValueError, TypeError): 
-                    continue 
+                val = self.board[r][c]  
                 if isinstance(val, int) and val > max_step: 
                     max_step = val 
                     row, col = r, c
-        return max_step, (row, col)
+        return (row, col)
         
     def solveRecursive(self): 
-        max_step, (row, col) = self.getMaxStep()
- 
-        # upTry
-        upTry = self.getCopiedBoard()
-        if upTry.step((row, col), 'up'):
-            if upTry.canMoveToEnd():
-                self.board = upTry.board
-                return True
-            if upTry.solveRecursive():
-                self.board = upTry.board
-                return True
-
-        # rightTry 
-        rightTry = self.getCopiedBoard()
-        if rightTry.step((row, col), 'right'):
-            if rightTry.canMoveToEnd():
-                self.board = rightTry.board
-                return True
-            if rightTry.solveRecursive():
-                self.board = rightTry.board
-                return True
-            
-        # downTry
-        downTry = self.getCopiedBoard() 
-        if downTry.step((row, col), 'down'):
-            if downTry.canMoveToEnd():
-                self.board = downTry.board
-                return True
-            if downTry.solveRecursive():
-                self.board = downTry.board
-                return True
-
-        # leftTry
-        leftTry = self.getCopiedBoard()
-        if leftTry.step((row, col), 'left'):
-            if leftTry.canMoveToEnd():
-                self.board = leftTry.board
-                return True
-            if leftTry.solveRecursive():
-                self.board = leftTry.board
-                return True
+        for direction in ['up', 'right', 'down', 'left']:
+            next_try = self.getCopiedBoard()
+            if next_try.step(direction):
+                if next_try.canMoveToEnd():
+                    self.board = next_try.board
+                    return True
+                if next_try.solveRecursive():
+                    self.board = next_try.board
+                    return True
 
         return False
-
       
 # Example usage:
 if __name__ == "__main__":
     game_board = GameBoard() 
+    game_board.display()
 
     solution = game_board.solveRecursive()
     if solution:
