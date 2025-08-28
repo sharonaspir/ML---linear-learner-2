@@ -84,7 +84,7 @@ class GameBoard:
                     row, col = r, c
         return max_step, (row, col)
         
-    def solve(self): 
+    def solveRecursive(self): 
         max_step, (row, col) = self.getMaxStep()
  
         # upTry
@@ -93,7 +93,7 @@ class GameBoard:
             if upTry.canMoveToEnd():
                 self.board = upTry.board
                 return True
-            if upTry.solve():
+            if upTry.solveRecursive():
                 self.board = upTry.board
                 return True
 
@@ -103,7 +103,7 @@ class GameBoard:
             if rightTry.canMoveToEnd():
                 self.board = rightTry.board
                 return True
-            if rightTry.solve():
+            if rightTry.solveRecursive():
                 self.board = rightTry.board
                 return True
             
@@ -113,7 +113,7 @@ class GameBoard:
             if downTry.canMoveToEnd():
                 self.board = downTry.board
                 return True
-            if downTry.solve():
+            if downTry.solveRecursive():
                 self.board = downTry.board
                 return True
 
@@ -123,7 +123,7 @@ class GameBoard:
             if leftTry.canMoveToEnd():
                 self.board = leftTry.board
                 return True
-            if leftTry.solve():
+            if leftTry.solveRecursive():
                 self.board = leftTry.board
                 return True
 
@@ -134,7 +134,7 @@ class GameBoard:
 if __name__ == "__main__":
     game_board = GameBoard() 
 
-    solution = game_board.solve()
+    solution = game_board.solveRecursive()
     if solution:
         game_board.display()
     else:
